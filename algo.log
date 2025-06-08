@@ -1,0 +1,4 @@
+LOG: 2025/06/08 22:27:44 main.go:9: 🚀 Hello Trader! Algo with custom logger started.
+LOG: 2025/06/08 22:27:44 main.go:10: ✅ Logger working fine. Time to trade!
+LOG: 2025/06/08 22:28:10 main.go:9: 🚀 Hello Trader! Algo with custom logger started.
+LOG: 2025/06/08 22:28:10 main.go:10: ✅ Logger working fine. Time to trade!
