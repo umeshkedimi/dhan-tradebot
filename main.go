@@ -14,7 +14,7 @@ func main() {
 	dhanClient := dhan.InitDhanClient()
 	logger.Printf("✅ Dhan client initialized: %s", dhanClient.ClientID)
 
-    telegram.StartTelegramListener()
+    telegram.StartTelegramListener(dhanClient)
     logger.Println("📡 Telegram bot listener activated.")
 
     // Keep main.go running

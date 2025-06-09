@@ -1,6 +1,7 @@
 package dhan
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -29,4 +30,21 @@ func InitDhanClient() *DhanClient {
 		ClientID:    clientID,
 		AccessToken: accessToken,
 }
+}
+
+// PlaceOrder simulates placing an order with Dhan (for now)
+func (dc *DhanClient) PlaceOrder(tradeType string) string {
+    var action string
+    if tradeType == "buy" {
+        action = "🟢 Placing BUY order..."
+    } else if tradeType == "sell" {
+        action = "🔴 Placing SELL order..."
+    } else {
+        return "❌ Invalid order type!"
+    }
+
+    // Simulate order logic — real Dhan API will go here
+    fmt.Printf("%s [ClientID: %s, AccessToken: %s]\n", action, dc.ClientID, dc.AccessToken)
+
+    return fmt.Sprintf("✅ Order placed: %s (simulated)", tradeType)
 }

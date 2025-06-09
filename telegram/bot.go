@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+    "github.com/umeshkedimi/dhan-tradebot/dhan"
+
 )
 
 var lastUpdateID int
@@ -101,7 +103,7 @@ func SendMessage(chatID int64, text string) {
 }
 
 // This will run in a goroutine
-func StartTelegramListener() {
+func StartTelegramListener(dhanClient *dhan.DhanClient) {
 	initLastUpdateID() // Skips old messages on startup
     go func() {
         log.Println("📡 Telegram listener started...")
@@ -122,10 +124,9 @@ func StartTelegramListener() {
                 log.Printf("📨 Received Telegram message: %s", text)
 
                 switch text {
-                case "buy":
-                    SendMessage(chatID, "🟢 Buy command received.")
-                case "sell":
-                    SendMessage(chatID, "🔴 Sell command received.")
+                case "buy", "sell":
+                    result := dhanClient.PlaceOrder(text)
+                    SendMessage(chatID, result)
                 case "pnls":
                     SendMessage(chatID, "💰 PnL: ₹1234.56 (dummy)")
                 default:
