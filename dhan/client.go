@@ -5,6 +5,7 @@ import (
     "log"
     "os"
     "encoding/json"
+    "strconv"
 
     "github.com/joho/godotenv"
     "github.com/go-resty/resty/v2"
@@ -13,6 +14,11 @@ import (
 type DhanClient struct {
 	ClientID string
 	AccessToken string
+	Target        float64
+    Stoploss      float64
+    TrailStart    float64
+    TrailStep     float64
+    CurrentTrail  float64
 }
 
 func InitDhanClient() *DhanClient {
@@ -23,6 +29,10 @@ func InitDhanClient() *DhanClient {
 
 	clientID := os.Getenv("DHAN_CLIENT_ID")
 	accessToken := os.Getenv("DHAN_ACCESS_TOKEN")
+	target, _ := strconv.ParseFloat(os.Getenv("PNL_TARGET"), 64)
+	stoploss, _ := strconv.ParseFloat(os.Getenv("PNL_STOPLOSS"), 64)
+	trailStart, _ := strconv.ParseFloat(os.Getenv("TRAIL_START"), 64)
+	trailStep, _ := strconv.ParseFloat(os.Getenv("TRAIL_STEP"), 64)
 
 	if clientID == "" || accessToken == "" {
 		log.Fatal("❌ Dhan credentials not found in environment variables")
@@ -31,6 +41,11 @@ func InitDhanClient() *DhanClient {
 	return &DhanClient{
 		ClientID:    clientID,
 		AccessToken: accessToken,
+		Target:       target,
+    	Stoploss:     stoploss,
+    	TrailStart:   trailStart,
+    	TrailStep:    trailStep,
+    	CurrentTrail: stoploss, // initialize with base SL
 }
 }
 
@@ -79,3 +94,29 @@ func (dc *DhanClient) GetPnL() (float64, error) {
 
     return totalPnL, nil
 }
+
+func (dc *DhanClient) ShouldExit(pnl float64) (bool, string) {
+    // Check normal target
+    if pnl >= dc.Target {
+        return true, "🎯 Target hit"
+    }
+
+    // Check trailing SL only if enabled
+    if dc.TrailStart > 0 {
+        if pnl >= dc.TrailStart && pnl-dc.CurrentTrail >= dc.TrailStep {
+            dc.CurrentTrail += dc.TrailStep
+            log.Printf("🔁 Trailing SL moved up to ₹%.2f", dc.CurrentTrail)
+        }
+        if pnl <= dc.CurrentTrail {
+            return true, fmt.Sprintf("🛑 Trailing SL hit (₹%.2f)", dc.CurrentTrail)
+        }
+    } else {
+        // Fallback to normal SL
+        if pnl <= dc.Stoploss {
+            return true, "🛑 Stop-loss hit"
+        }
+    }
+
+    return false, ""
+}
+
