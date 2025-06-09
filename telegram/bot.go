@@ -31,6 +31,35 @@ func getBotToken() string {
 	return os.Getenv("TELEGRAM_BOT_TOKEN")
 }
 
+func initLastUpdateID() {
+    botToken := getBotToken()
+    url := fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", botToken)
+
+    resp, err := http.Get(url)
+    if err != nil {
+        log.Printf("❌ Error initializing update ID: %v", err)
+        return
+    }
+    defer resp.Body.Close()
+
+    body, _ := io.ReadAll(resp.Body)
+    var result struct {
+        OK     bool              `json:"ok"`
+        Result []TelegramUpdate  `json:"result"`
+    }
+
+    if err := json.Unmarshal(body, &result); err != nil {
+        log.Printf("❌ JSON error initializing update ID: %v", err)
+        return
+    }
+
+    if len(result.Result) > 0 {
+        lastUpdateID = result.Result[len(result.Result)-1].UpdateID
+        log.Printf("🔁 Skipping old messages. Starting from update_id: %d", lastUpdateID+1)
+    }
+}
+
+
 func getTelegramUpdates() ([]TelegramUpdate, error) {
 	botToken := getBotToken()
 	offset := lastUpdateID + 1
@@ -73,6 +102,7 @@ func SendMessage(chatID int64, text string) {
 
 // This will run in a goroutine
 func StartTelegramListener() {
+	initLastUpdateID() // Skips old messages on startup
     go func() {
         log.Println("📡 Telegram listener started...")
         for {
