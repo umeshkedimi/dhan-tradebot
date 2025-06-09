@@ -2,3 +2,6 @@ LOG: 2025/06/08 22:27:44 main.go:9: 🚀 Hello Trader! Algo with custom logger s
 LOG: 2025/06/08 22:27:44 main.go:10: ✅ Logger working fine. Time to trade!
 LOG: 2025/06/08 22:28:10 main.go:9: 🚀 Hello Trader! Algo with custom logger started.
 LOG: 2025/06/08 22:28:10 main.go:10: ✅ Logger working fine. Time to trade!
+LOG: 2025/06/09 08:40:31 main.go:10: 🚀 Algo Starting...
+LOG: 2025/06/09 08:40:31 main.go:13: ✅ Dhan client initialized.
+LOG: 2025/06/09 08:40:31 main.go:14: Client ID: 1100807014
