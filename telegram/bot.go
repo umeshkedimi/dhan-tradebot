@@ -128,7 +128,12 @@ func StartTelegramListener(dhanClient *dhan.DhanClient) {
                     result := dhanClient.PlaceOrder(text)
                     SendMessage(chatID, result)
                 case "pnls":
-                    SendMessage(chatID, "💰 PnL: ₹1234.56 (dummy)")
+                    pnl, err := dhanClient.GetPnL()
+                    if err != nil {
+                        SendMessage(chatID, fmt.Sprintf("❌ Error fetching PnL: %v", err))
+                    } else {
+                        SendMessage(chatID, fmt.Sprintf("💰 Current PnL: ₹%.2f", pnl))
+                    }
                 default:
                     SendMessage(chatID, "🤖 Unknown command. Try: buy, sell, pnls")
                 }

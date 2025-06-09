@@ -1,11 +1,13 @@
 package dhan
 
 import (
-	"fmt"
-	"log"
-	"os"
+    "fmt"
+    "log"
+    "os"
+    "encoding/json"
 
-	"github.com/joho/godotenv"
+    "github.com/joho/godotenv"
+    "github.com/go-resty/resty/v2"
 )
 
 type DhanClient struct {
@@ -47,4 +49,33 @@ func (dc *DhanClient) PlaceOrder(tradeType string) string {
     fmt.Printf("%s [ClientID: %s, AccessToken: %s]\n", action, dc.ClientID, dc.AccessToken)
 
     return fmt.Sprintf("✅ Order placed: %s (simulated)", tradeType)
+}
+
+func (dc *DhanClient) GetPnL() (float64, error) {
+    client := resty.New()
+
+    resp, err := client.R().
+        SetHeader("access-token", dc.AccessToken).
+        SetHeader("client-id", dc.ClientID).
+        Get("https://api.dhan.co/positions")
+
+    if err != nil {
+        return 0, fmt.Errorf("❌ Error fetching positions: %v", err)
+    }
+
+    var positions []struct {
+        RealisedProfit   float64 `json:"realisedProfit"`
+        UnrealisedProfit float64 `json:"unrealisedProfit"`
+    }
+
+    if err := json.Unmarshal(resp.Body(), &positions); err != nil {
+        return 0, fmt.Errorf("❌ JSON parse error: %v", err)
+    }
+
+    totalPnL := 0.0
+    for _, pos := range positions {
+        totalPnL += pos.RealisedProfit + pos.UnrealisedProfit
+    }
+
+    return totalPnL, nil
 }

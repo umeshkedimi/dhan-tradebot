@@ -23,3 +23,6 @@ LOG: 2025/06/09 14:01:19 main.go:18: 📡 Telegram bot listener activated.
 LOG: 2025/06/09 15:48:41 main.go:12: 🚀 Algo Starting...
 LOG: 2025/06/09 15:48:41 main.go:15: ✅ Dhan client initialized: 1100807014
 LOG: 2025/06/09 15:48:42 main.go:18: 📡 Telegram bot listener activated.
+LOG: 2025/06/09 16:12:56 main.go:12: 🚀 Algo Starting...
+LOG: 2025/06/09 16:12:56 main.go:15: ✅ Dhan client initialized: 1100807014
+LOG: 2025/06/09 16:12:57 main.go:18: 📡 Telegram bot listener activated.
